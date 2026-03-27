@@ -1,0 +1,35 @@
+<h2>Purpose of Tool</h2>
+<p>Use this tool to generate accessible text descriptions for charts and graphs. This ensures all students have equal access to course materials and content, complying with accessibility standards and promoting quality teaching. This tool creates a text description that can be used as alternative text for images, making visual information available to students using assistive technology.</p>
+<p>The use cases for this tool include providing accessible content for courses, creating inclusive learning experiences, and ensuring that all students can fully participate in the learning process here at UF. For example, this tool can help avoid barriers for students using screen readers or other assistive devices, allowing them to understand the information presented in graphs and charts.</p>
+<h2>Instructions</h2>
+<p>Enter your Navigator Toolkit API key and upload a graph image or PDF to generate an accessible text description. You can either upload a file or paste an image directly into the paste area below.</p>
+<p><strong>Your API key is used only within your browser session and is not stored on our servers, ensuring its security.</strong></p>
+<form id="graph-form">
+<div class="api-key-field"><label for="api-key">Navigator Toolkit API Key:</label> <input id="api-key" name="api-key" required="" type="password" />
+<div class="api-help-text">
+<p><small><strong>Need an API key?</strong> Navigator Toolkit provides access to AI models at UF. <a href="https://it.ufl.edu/ai/navigator-toolkit/" target="_blank" rel="noopener">Get your NaviGator Toolkit API key here</a>.</small></p>
+<p><small><strong>Important:</strong> When creating your API key, under the 'Create New Key' button within the 'Key Details' section, make sure to select <strong>"All Team Models"</strong> instead of a specific model to ensure this tool works properly.</small></p>
+</div>
+</div>
+<div class="upload-section">
+<div class="upload-image"><label for="image-upload">Upload Graph Image or PDF:</label> <input id="image-upload" accept="image/*,.pdf" name="image-upload" type="file" /></div>
+<div class="paste-area" id="paste-area">
+<p>Or paste an image here (Ctrl+V / Cmd+V)</p>
+<span class="paste-hint">Click here first, then paste your image</span></div>
+</div>
+<div id="image-preview-container" style="display: none;">
+<h3>Image Preview:</h3>
+<img id="image-preview" alt="Uploaded image preview" /></div>
+<button id="generate-btn" type="submit">Generate Alt Text</button></form>
+<div id="output">
+<h2>Graph Description:</h2>
+<textarea id="graph-description" style="width: 700px; height: 150px;" cols="70" readonly="readonly" rows="8"></textarea> <button id="copyButton">Copy</button></div>
+<h2>&nbsp;</h2>
+<h2>Resources</h2>
+<p>For more information on creating accessible content, please visit:</p>
+<ul>
+<li><a href="https://citt.it.ufl.edu/resources/course-development/accessible-course-design/accessibility-in-stem-courses/" target="_blank" rel="noopener">CITT: Accessibility in STEM Courses</a></li>
+<li><a href="https://citt.it.ufl.edu/services/accessibility/" target="_blank" rel="noopener">CITT: Accessibility Resources</a></li>
+<li><a href="https://citt.it.ufl.edu/resources/course-development/" target="_blank" rel="noopener">CITT: Course Development Resources</a></li>
+<li><a href="https://it.ufl.edu/ai/" target="_blank" rel="noopener">UFIT AI Resources</a></li>
+</ul>
