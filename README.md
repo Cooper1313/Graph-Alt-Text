@@ -1,3 +1,4 @@
+[![Graph Alt-Text Converter](https://img.shields.io/badge/-View_Project-0077B5?style=for-the-badge&logo=github&logoColor=white)](https://github.com/kaiyacooper/Graph-Alt-Text)
 # Graph-Alt-Text
 Use this tool to generate accessible text descriptions for charts and graphs.
 # Purpose of Tool
