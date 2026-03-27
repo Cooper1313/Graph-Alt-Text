@@ -1,7 +1,8 @@
 # Graph-Alt-Text
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E.svg?logo=javascript&logoColor=black)
-![OpenAI](https://img.shields.io/badge/OpenAI-412991.svg?logo=openai&logoColor=white)
-![Accessibility](https://img.shields.io/badge/Accessibility-00A67E.svg)
+![Built with: JavaScript](https://img.shields.io/badge/Built_with-JavaScript-F7DF1E.svg)
+![Built with: OpenAI API](https://img.shields.io/badge/Built_with-OpenAI_API-412991.svg)
+![Built with: Terminal4](https://img.shields.io/badge/Built_with-Terminal4-0077B5.svg)
+![Focus: Accessibility](https://img.shields.io/badge/Focus-Accessibility-00A67E.svg)
 
 Use this tool to generate accessible text descriptions for charts and graphs.
 # Purpose of Tool
