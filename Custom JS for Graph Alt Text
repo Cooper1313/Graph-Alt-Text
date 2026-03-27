@@ -1,0 +1,196 @@
+const form = document.getElementById('graph-form');
+const apiKeyInput = document.getElementById('api-key');
+const imageUploadInput = document.getElementById('image-upload');
+const pasteArea = document.getElementById('paste-area');
+const imagePreview = document.getElementById('image-preview');
+const imagePreviewContainer = document.getElementById('image-preview-container');
+const graphDescriptionTextarea = document.getElementById('graph-description');
+const copyButton = document.getElementById('copyButton');
+const generateBtn = document.getElementById('generate-btn');
+
+let currentImageFile = null;
+
+// Display image preview
+function showImagePreview(file) {
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            imagePreviewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // For PDFs or other files, just show the container without preview
+        imagePreview.src = '';
+        imagePreviewContainer.style.display = 'block';
+        imagePreview.style.display = 'none';
+    }
+    currentImageFile = file;
+}
+
+// File upload
+imageUploadInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        showImagePreview(file);
+    }
+});
+
+// Paste function
+pasteArea.addEventListener('click', function() {
+    pasteArea.focus();
+});
+
+pasteArea.addEventListener('focus', function() {
+    pasteArea.classList.add('active');
+});
+
+pasteArea.addEventListener('blur', function() {
+    pasteArea.classList.remove('active');
+});
+
+// Focus paste area
+pasteArea.setAttribute('tabindex', '0');
+
+pasteArea.addEventListener('paste', function(e) {
+    e.preventDefault();
+    const items = e.clipboardData.items;
+    
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            const file = items[i].getAsFile();
+            showImagePreview(file);
+
+            // Clear the file input if using pasted image
+            imageUploadInput.value = '';
+            break;
+        }
+    }
+});
+
+document.addEventListener('paste', function(e) {
+    if (document.activeElement === pasteArea) {
+        return; // Already handled by pasteArea listener
+    }
+    
+// formatting style for paste function to make page more cohesive
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+            e.preventDefault();
+            const file = items[i].getAsFile();
+            showImagePreview(file);
+            imageUploadInput.value = '';
+            pasteArea.focus();
+            break;
+        }
+    }
+});
+
+form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const apiKey = apiKeyInput.value;
+    const imageFile = currentImageFile || imageUploadInput.files[0];
+    
+    if (!apiKey || !imageFile) {
+        alert('Please enter an API key and upload an image or paste an image.');
+        return;
+    }
+    
+    // Loading message
+    generateBtn.textContent = 'Generating...';
+    generateBtn.disabled = true;
+    graphDescriptionTextarea.value = 'Processing your image...';
+    
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const imageData = e.target.result;
+        
+        const prompt = `You are an expert in creating accessible descriptions of visual content for students with disabilities, specifically for STEM fields. Your goal is to generate concise and informative alternative text ("alt text") for images of graphs and charts that will be read aloud by screen readers.
+
+When creating alt text, follow these screen reader accessibility guidelines:
+
+1. **Structure for listening**: Write in clear, complete sentences that flow naturally when read aloud
+2. **Colors as secondary identifiers**: If multiple data series exist, mention colors AFTER describing what each represents (e.g., "Loan loss reserves, represented by the blue bars, show..." not "The blue bars show...")
+3. **Define abbreviations**: Always spell out acronyms and abbreviations on first use
+4. **Logical flow**: Present information in the order a listener needs to understand it
+5. **Conversational tone**: Write as if explaining the chart to someone over the phone
+
+Format your response as follows:
+- Start with chart type and main topic
+- Clearly state what the axes represent  
+- Identify each data series by its meaning first, then mention its color representation
+- Present key findings in order of importance
+- Use phrases like "shows that," "indicates," "reveals" for natural flow
+
+**Always describe WHAT the data represents before mentioning its color.**
+
+Return only the alt text that will be read aloud. Keep it under 200 words for optimal screen reader experience.
+
+Example: "Bar chart showing quarterly sales performance for 2023. The horizontal axis shows quarters and the vertical axis measures sales in thousands of dollars. Actual sales, represented by blue bars, started at 50 thousand in quarter one and peaked at 85 thousand in quarter three. Projected sales, shown by orange bars, consistently remained 10 thousand below actual sales throughout the year."`;
+        
+        try {
+            const response = await fetch('https://api.ai.it.ufl.edu/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: "gemma-3-27b-it",
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                {
+                                    type: "text",
+                                    text: prompt
+                                },
+                                {
+                                    type: "image_url",
+                                    image_url: {
+                                        url: imageData
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    max_tokens: 1000,
+                    temperature: 0.3
+                })
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}. Response: ${errorText}`);
+            }
+            
+            const data = await response.json();
+            console.log("Full API Response:", data);
+            
+            if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+                graphDescriptionTextarea.value = data.choices[0].message.content;
+            } else {
+                throw new Error("Unexpected API response format");
+            }
+            
+        } catch (error) {
+            console.error('Error calling API:', error);
+            graphDescriptionTextarea.value = 'Error processing the image: ' + error.message + 
+                '\n\nPlease check that your API key is valid and that you have access to the Gemma model with vision capabilities.';
+        } finally {
+            // Reset button state
+            generateBtn.textContent = 'Generate Alt Text';
+            generateBtn.disabled = false;
+        }
+    };
+    
+    reader.readAsDataURL(imageFile);
+});
+
+copyButton.addEventListener('click', function() {
+    graphDescriptionTextarea.select();
+    document.execCommand('copy');
+    alert('Alt text copied to clipboard!');
+});
